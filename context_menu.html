@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>
+      Mobile Final
+    </title>
+
+    <link href="topcoat-mobile-light.css" rel="stylesheet">
+    <script src="jquery-2.1.0.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+      
+
+      $("#add_new_login_title").click(function(){
+        $("#add_new_login_body").slideToggle();
+      });
+
+      $("#google_login_1_title").click(function(){
+        $("#google_login_1_body").slideToggle();
+      });
+    });
+    </script>
+  </head>
+
+
+  <body style="width:300px;border:1px solid black;margin:auto auto;">
+  <!--************************************************************************************************-->
+    <div id="left_box" style="width:300px;height:615px;background:rgba(80,80,80,1);overflow:hidden;display:block;z-index:11;position:fixed;top:0px;left:0px;">
+
+    <div style="overflow:hidden;" class="" id="">
+      <div class="topcoat-navigation-bar" id="" style="color:white;background:rgba(24,44,68,1);">
+        <div class="topcoat-navigation-bar__item center full">
+          <h1 class="topcoat-navigation-bar__title" style="color:white;"> Settings </h1>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(79,97,118,1);text-align:center;color:black;">
+      <div style="height:50px;width:300px;line-height:50px;font-size:20px;"> Facebook </div>
+      <div style="border:0px solid white;border-top:1px solid white;width:280px;color:white;margin:0px auto;"> </div>
+      <div style="height:50px;width:300px;line-height:50px;font-size:20px;"> Google </div>
+      <div style="border:0px solid white;border-top:1px solid white;width:280px;color:white;margin:0px auto;"> </div>
+      <div style="height:50px;width:300px;line-height:50px;font-size:20px;"> Add New </div>
+    </div>
+
+  </div>
+  <!--************************************************************************************************-->
+  </body>
+</html>

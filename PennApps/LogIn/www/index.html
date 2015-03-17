@@ -1,0 +1,628 @@
+<html>
+<head>
+
+  <title>
+    Mobile Final
+  </title>
+
+
+  <link href="css/topcoat-mobile-light.css" rel="stylesheet">
+  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+  <script src="js/jquery-2.1.0.min.js"></script>
+  <script src="clientSocket.js"></script>
+  <script type="text/javascript" chatset="utf-8">
+  
+  
+    document.onselectstart=function(){return false;};
+    document.addEventListener("ready", onDeviceReady, false);
+    var onDeviceReady = function(){
+      //
+    }
+
+    var d = document;
+    var getId = "getElementById";
+    String.prototype.capitalize = function() {
+      return this.charAt(0).toUpperCase() + this.slice(1);
+    }
+
+
+    $(document).ready(function(){
+      init_App.init_settings();
+       //setting option
+       document.body.addEventListener("contextmenu", function(){
+        $("#center_box").animate({
+          left : "300px"
+        },500);
+        $("#right_box").animate({
+          left : "360px"
+        },500);
+      },false);
+
+       document.addEventListener("menubutton", function(){
+
+        $("#center_box").animate({
+          left : "300px"
+        },500);
+        $("#right_box").animate({
+          left : "360px"
+        },500);
+      },false);
+
+       document.addEventListener("backbutton", function(e){
+         if(true){
+           e.preventDefault();
+           if(d[getId]("center_box").style.left == "300px"){
+            $("#center_box").animate({
+              left : "0px"
+            },500);
+          }
+
+          if(d[getId]("right_box").style.left == "0px"){
+            $("#right_box").animate({
+              left : "360px"
+            },500);
+          }
+
+           //navigator.app.exitApp();
+         }
+         else {
+           navigator.app.backHistory()
+         }
+       }, false);
+
+
+
+		document.getElementById("center_box").onscroll=function(){
+			console.log(this.pageXOffset);
+		}
+
+       $("#center_box").click(function(){
+        $("#center_box").animate({
+          left : "0px"
+        },300);
+      });
+
+
+     });
+
+var placeHolder = function(ele, def, custom){
+  if(ele.value == def) {
+    if(custom != undefined) {
+      ele.value = custom;
+    }
+    else {
+      ele.value = "";
+    }
+  }
+  else if(ele.value == "" || ele.value == custom){
+    ele.value = def;
+  }
+}
+
+var editAppMainPage = {
+  "setTitle" : function(title){
+    d.getElementById("app_main_display_title").innerText = title;
+  },
+
+  "setBody" : function(data){
+    d.getElementById("app_main_display_body").innerHTML = data;
+  }
+}
+
+var loadCredentials = function(ele){
+  $("#center_box").click();
+  var site = ele.getAttribute("data-site");
+  var domain = ele.getAttribute("data-domain");
+
+  editAppMainPage.setTitle(site.capitalize());
+
+  var db = init_App.load_db();
+  var content = "";
+  for(var i = 0; i < db.length; i++) {
+    if(db[i].site == site && db[i].domain == domain) {
+      for(var j = 0; j < db[i].logins.length; j++) {
+        content += showLogin.title(site, domain, db[i].logins[j].title);
+      }
+    }
+  }
+
+  editAppMainPage.setBody(content + addNewLogin.template.title(site.toLowerCase(), site, domain));
+}
+
+
+var loadSingleLogin = function(ele, title){
+  var site = ele.getAttribute("data-site");
+  var domain = ele.getAttribute("data-domain");
+  var db = init_App.load_db();
+  var content = "";
+
+  for(var i = 0; i < db.length; i++) {
+    if(db[i].site == site && db[i].domain == domain) {
+      for(var j = 0; j < db[i].logins.length; j++) {
+        if (db[i].logins[j].title == title) {
+          content += showLogin.body(site, domain, db[i].logins[j].title, db[i].logins[j].username, db[i].logins[j].password);
+        }
+      }
+    }
+  }
+  d[getId]("right_box").innerHTML = content;
+  $("#right_box").animate({
+    left : "0px"
+  },500);
+}
+
+
+var showLogin = {
+  "body" : function(site, domain, title, username, password){
+    var text1 = "<div style=\"overflow:hidden;width:360;\" class=\"logins\" id=\"\"> <div class=\"topcoat-navigation-bar\" id=\" " + title + "_title\" style=\"color:white;background:rgba(200,200,200,1);\"><div class=\"topcoat-navigation-bar__item center full\" onclick=\"\"><h1 class=\"topcoat-navigation-bar__title\">" + title.capitalize() + "</h1></div></div> <div id=\"" + title + "_body\" style=\"width:340px;height:616px;margin:auto auto;display:block;\"><br> <form> <input type=\"hidden\" name=\"domain\" value=\""+ domain +"\"> <input type=\"hidden\" name=\"title\" value=\""+ title +"\"> <input type=\"hidden\" name=\"site\" value=\""+ site +"\"> <input name=\"username\" type=\"text\" class=\"topcoat-text-input\" value=\""+ username + "\" disabled=\"false\"> <br> <br> <input name=\"password\" type=\"password\" class=\"topcoat-text-input\" value=\"" + password + "\" disabled> <br> <br> <label class=\"topcoat-switch\"> <input type=\"checkbox\" class=\"topcoat-switch__input\" onchange=\"showPassword(this)\">  <div class=\"topcoat-switch__toggle\"></div> </label> <br>  <br> <button class=topcoat-button id=\"\" onclick=\"enableEdit(this, title);\"> Edit </button> <button class=topcoat-button id=\"\" onclick=\"event.preventDefault();deleteLogin.confirm(this, '" + title + "');\"> Delete </button>  </form> </div> </div> ";
+    return text1;
+  },
+
+  "title" : function(site, domain, title){
+    var out = "<div style=\"overflow:hidden;\" class=\"logins\" id=\"\"> <div class=\"topcoat-navigation-bar\" id=\" " + title + "_title\" onclick=\'loadSingleLogin(this,\"" + title + "\")\' data-site=\"" + site + "\" data-domain=\"" + domain + "\" style=\"color:white;background:rgba(200,200,200,1);\"><div class=\"topcoat-navigation-bar__item center full\" onclick=\"\"><h1 class=\"topcoat-navigation-bar__title\">" + title.capitalize() + "</h1></div></div>";
+    return out;
+  }
+}
+
+var enableEdit = function(ele, title) {
+  event.preventDefault();
+  var text = ele.innerText;
+  if(text == "Edit") {
+    ele.innerText = "Done";
+    var input = ele.parentElement.getElementsByTagName("input");
+    for (var i = 0; i < input.length; i++) {
+      input[i].removeAttribute("disabled");
+    }
+
+  }
+  else if(text == "Done") {
+    editLogin(ele.parentElement, title);
+    ele.innerText = "Edit";
+    var input = ele.parentElement.getElementsByTagName("input");
+    for (var i = 0; i < input.length - 1; i++) {
+      input[i].setAttribute("disabled");
+    }
+  }
+}
+
+var showPassword = function(ele){
+  var input = ele.parentElement.parentElement.getElementsByTagName("input");
+  for (var i = 0; i < input.length; i++) {
+    console.log(i + " " + input[i].name);
+    if (input[i].name == "password") {
+      if(ele.checked) {
+        input[i].type = "text"
+      }
+      else {
+        input[i].type = "password";
+      }
+    }
+
+  }
+}
+
+
+var addToDatabase = function(val){
+  window.localStorage.setItem("App_database", val);
+  if(window.localStorage.getItem("App_database") == val) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+var init_Database = function(){
+  if(window.localStorage.getItem("App_database")) {
+
+  }
+  else {
+    window.localStorage.setItem("App_database", "[]");
+    console.log("Initializing Database!");
+  }
+}
+init_Database();
+
+var checkDatabase = function(site, domain) {
+  var db = getDatabase();
+  var db_json = JSON.parse(db);
+
+  for(var i = 0; i < db_json.length; i++) {
+    if (db_json[i].domain == domain || db_json[i].site == site) {
+      console.log("Domain / Site Name exists.");
+      return true;
+    }
+  }
+  return false;
+}
+
+var getDatabase = function(){
+  if(window.localStorage.getItem("App_database")) {
+    return window.localStorage.getItem("App_database");
+  }
+  else {
+    console.log("Not found!");
+    return false;
+  }
+}
+
+var smoothBlurPos = 0;
+var focusTimecount;
+
+var smoothFocusBlur = function(newPos) {
+  window.clearTimeout(focusTimecount);
+
+	if(smoothBlurPos > newPos){
+		x = smoothBlurPos - newPos;
+          x = "-=" + x;
+		$("#center_box").animate({
+			top : x
+		},800);
+	}
+	else {
+		x = newPos - smoothBlurPos;
+    x = "+=" + x;
+		$("#center_box").animate({
+			top : x
+		},800);
+	}
+
+    if(newPos == 0)
+    smoothBlurPos = 0;
+}
+
+var addNewSite = {
+
+  "template" : "<div style=\"width:300px;height:800px;margin:auto;\"> <form> <br> <input type=\"text\" name=\"site_name\" class=\"topcoat-text-input\" onfocus=\"smoothFocusBlur(0);placeHolder(this, 'Site Name');\" onblur=\"placeHolder(this, 'Site Name');\" value=\"Site Name\">  <br> <br> <input type=\"text\" name=\"login_title\" class=\"topcoat-text-input\" onfocus=\"smoothFocusBlur(-45);placeHolder(this, 'Login Title');\" onblur=\"smoothBlurPos = -45;focusTimecount = setTimeout(function(){smoothFocusBlur(0)},500);placeHolder(this, 'Login Title');\" value=\"Login Title\">  <br> <br> <input type=\"text\" name=\"address\" class=\"topcoat-text-input\" onfocus=\"smoothFocusBlur(-90);placeHolder(this, 'Address', 'https://');\" onblur=\"smoothBlurPos = -90;focusTimecount = setTimeout(function(){smoothFocusBlur(0)},500);placeHolder(this, 'Address', 'https://');\" value=\"Address\"> <br> <br> <input type=\"text\" name=\"username\" class=\"topcoat-text-input\" onfocus=\"smoothFocusBlur(-140);placeHolder(this, 'Username/ Email');\" onblur=\"smoothBlurPos = -140;focusTimecount = setTimeout(function(){smoothFocusBlur(0)},500);placeHolder(this, 'Username/ Email');\" value=\"Username/ Email\"> <br> <br> <input type=\"password\" name=\"password\" class=\"topcoat-text-input\" onfocus=\"smoothFocusBlur(-170);placeHolder(this, 'Password');\" onblur=\"smoothBlurPos = -170;focusTimecount = setTimeout(function(){smoothFocusBlur(0)},500);placeHolder(this, 'Password');\" value=\"Password\"> <br> <br> <button class=\"topcoat-button\" id=\"\" onclick=\"event.preventDefault();addNewSite.parseForm(this.parentElement);\"> Done </button> </form> </div> ",
+
+  "init" : function() {
+    $("#center_box").click();
+    var title = "Add New";
+    editAppMainPage.setTitle(title);
+    editAppMainPage.setBody(this.template);
+  },
+
+  "parseForm" : function(form){
+    if(form.site_name.value == "" || form.site_name.value == "Site Name") {
+      alert("Please Enter Site Name");
+      return;
+    }
+    if(form.login_title.value == "" || form.login_title.value == "Login Title") {
+      alert("Please Enter Login Title");
+      return;
+    }
+
+    if(form.address.value == "" || form.address.value == "Address") {
+          //send eror
+          alert("Please Enter Address");
+          return;
+        }
+        if(form.username.value == "" || form.username.value == "Username/ Email") {
+          //send eror
+          alert("Please Enter Username");
+          return;
+        }
+        if(form.password.value == "" || form.password.value == "Password") {
+          //send eror
+          alert("Please Enter Password");
+          return
+        }
+        this.commit(form.site_name.value, form.address.value, form.login_title.value, form.username.value, form.password.value);
+      },
+
+      "commit" : function(site, domain, title, username, password){
+        var db = getDatabase();
+        var db_json = JSON.parse(db);
+
+        var new_json = {"site" : site, "domain" : domain, "logins" : [{"title" : title, "username" : username, "password" : password}]};
+        
+
+        for(var i = 0; i < db_json.length; i++) {
+          if (db_json[i].site == site && db_json[i].domain == domain) {
+            console.log("Domain already exists.");
+            return;
+          }
+        }
+
+        db_json.push(new_json);
+
+        if (addToDatabase(JSON.stringify(db_json))) {
+         navigator.notification.alert("Your logins has been saved Successfully!", function(){init_App.init_settings();}, "Login Saved", "Done");
+         console.log("Successfully Addded to Database.");
+         return;
+       }
+     }
+   }
+
+
+   var addNewLogin = {
+    "template" : {
+      "title" : function(title, site, domain){
+        var cont = "<div style=\"background:white;overflow:hidden;\" class=\"\" id=\"" + title + "_new_login\"> <div class=\"topcoat-navigation-bar\" id=\"" + title + "_new_login_title\" onclick=\"addNewLogin.template.body('" + title + "','site','" + domain + "')\" style=\"color:white;background:rgba(240,240,240,1);\">  <div class=\"topcoat-navigation-bar__item center full\"> <h1 class=\"topcoat-navigation-bar__title\"> Add New Login </h1> </div> </div> </div>";
+        return cont;
+      },
+      "body" : function(title, site, domain){
+        var cont = "<div style=\"background:white;overflow:hidden;height:546px;width:360px;\" class=\"\" id=\"" + title + "_new_login\"> <div class=\"topcoat-navigation-bar\" id=\"" + title + "_new_login_title\" style=\"color:white;background:rgba(240,240,240,1);width:360px;position:absolute;top:0px;left:0px;z-index:299;\">  <div class=\"topcoat-navigation-bar__item center full\"> <h1 class=\"topcoat-navigation-bar__title\"> Add New Login </h1> </div> </div>  <div id=\"" + title + "_new_login_body\" style=\"width:340px;height:616px;margin:auto;display:block;position:absolute;top:70px;left:10px;z-index:199;\"> <form> <input type=\"hidden\" name=\"domain\" value=\""+ domain +"\"> <input type=\"hidden\" name=\"site\" value=\""+ site +"\"> <br> <input type=\"text\" name=\"title\" class=\"topcoat-text-input\" onfocus=\"this.parentElement.parentElement.style.top='70px';placeHolder(this, 'Title')\" onblur=\"this.parentElement.parentElement.style.top='70px';placeHolder(this, 'Title')\" value=\"Title\">  <br> <br> <input type=\"text\" name=\"username\" class=\"topcoat-text-input\" onfocus=\"this.parentElement.parentElement.style.top='30px';placeHolder(this, 'Email/Phone')\" onblur=\"this.parentElement.parentElement.style.top='70px';placeHolder(this, 'Email/Phone')\" value=\"Email/Phone\">  <br> <br> <input type=\"password\" onfocus=\"this.parentElement.parentElement.style.top='-15px';placeHolder(this, 'Password')\" onblur=\"this.parentElement.parentElement.style.top='70px';placeHolder(this, 'Password')\" name=\"password\" class=\"topcoat-text-input\" value=\"Password\"> <br> <br> <button class=\"topcoat-button\" id=\"\" onclick=\"event.preventDefault();addNewLogin.parseForm(event, this.parentElement);\"> Done </button> </form> </div> </div>";
+
+        d[getId]("right_box").innerHTML = cont;
+        $("#right_box").animate({
+          left : "0px"
+        },500);
+      }
+    },
+
+    "parseForm" : function(eve, form) {
+
+      if(form.title.value == "" || form.title.value == "Title") {
+          //send eror
+          alert("Please Enter Valid Title");
+          return;
+        }
+
+
+        if(form.username.value == "" || form.username.value == "Username") {
+          //send eror
+          alert("Please Enter Username");
+          return;
+        }
+
+        if(form.password.value == "" || form.password.value == "Passwrord") {
+          //send eror
+          alert("Please Enter Password");
+          return;
+        }
+
+        var title = form.title.value;
+        var site = form.site.value;
+        var domain = form.domain.value;
+        var username = form.username.value;
+        var password = form.password.value;
+
+        console.log(site + " " + title + " " + domain + " " + username + " "  + password);
+        this.addNewLogin(site, title, domain, username, password);
+        return false;
+      },
+
+
+      "addNewLogin" : function(site, title, domain, username, password){
+        var newLogin = {"title" : title, "username" : username, "password" : password};
+        if(checkDatabase(site, domain)) {
+          var db = getDatabase();
+          var db_json = JSON.parse(db);
+          var loginPushed = false;
+
+          for(var i = 0; i < db_json.length; i++) {
+            console.log(db_json[i].domain);
+            if(db_json[i].domain == domain) {
+              //console.log(db_json[i].logins[0].title);
+              db_json[i].logins.push(newLogin);
+              loginPushed = true;
+              console.log("New Login Pushed!");
+            }
+          }
+
+          if(loginPushed && addToDatabase(JSON.stringify(db_json))) {
+            navigator.notification.alert("Your logins has been saved Successfully!", function(){}, "Login Saved", "Done");
+            console.log("Data added Successfully");
+          }
+          else {
+            console.log("New Login cannot be added.");
+          }
+        }
+        else {
+          console.log("New login not added -> " + site + " -> " + domain + " -> Database not found");
+          return false;
+        }
+      }
+    }
+
+    var editLogin = function(ele, title) {
+      var site = ele.site.value;
+      var domain = ele.domain.value;
+      var newUsername = ele.username.value;
+      var newPassword = ele.password.value;
+      var loginPushed = false;
+
+      console.log(site + " -> " + domain + " -> " );
+      if(checkDatabase(site, domain)) {
+        var db = getDatabase();
+        var db_json = JSON.parse(db);
+        var loginPushed = false;
+        for(var i = 0; i < db_json.length; i++) {
+          if(db_json[i].domain == domain && db_json[i].site == site) {
+            for(var j = 0; j < db_json[i].logins.length; j++) {
+              //if(db_json[i].logins[j].username == oldUsername && db_json[i].logins[j].password == oldPassword) {
+                db_json[i].logins[j].username = newUsername;
+                db_json[i].logins[j].password = newPassword;
+                loginPushed = true;
+              //}
+            }
+          }
+        }
+
+        if(loginPushed && addToDatabase(JSON.stringify(db_json))) {
+          console.log("Login details changed.");
+        }
+        else {
+          console.log("Login not changed.");
+        }
+      }
+    }
+
+    var deleteLogin =  {
+      "confirm"  : function(ele, title) {
+        var par = ele.parentElement;
+        var site = par.site.value;
+        var domain = par.domain.value;
+        var username = par.username.value;
+        var password = par.password.value;
+
+        var x = "<div id='delete_confirm_dialog' style='position:fixed;top:0px;left:0px;height:616px;width:360px;z-index:12313123123123131232;background:rgba(100,100,100,0.5);'><div style='height:266px;width:260px;background:;position:absolute;top:175;left:60;'><div style='height:50px;width:260px;background:rgba(50,50,50,0.9);color:white;text-align:center;line-height:50px;font-weight:bold;border-radius:5px 5px 0px 0px;'> Delete </div><div style='height:216px;width:220px;padding:0px 20px 0px 20px;background:rgba(120,120,120,1);color:black;text-align:left;line-height:35px;border-radius:0px 0px 5px 5px;'><div style='color:white;font-size:23px;line-height:30px;'> Are you sure you want to delete this Login? </div> <div style='color:white'> This action cannot be undone. </div> <br> <button class=topcoat-button id=\"\" onclick=\"deleteLogin.delete('" + site + "', '" + domain + "', '" + title + "', '" + username + "', '" + password + "');\"> Yes </button> <button class=topcoat-button id=\"\" onclick=\"$('#delete_confirm_dialog').remove();\"> No </button></div></div></div></div>";
+
+        var c = document.createElement("div");
+        c.innerHTML= x;
+        document.body.appendChild(c);
+      },
+
+      "delete" : function(site, domain, title, username, password) {
+        event.preventDefault();
+        var loginPushed = false;
+
+        if(checkDatabase(site, domain)) {
+          var db = getDatabase();
+          var db_json = JSON.parse(db);
+
+          for(var i = 0; i < db_json.length; i++) {
+            if(db_json[i].domain == domain && db_json[i].site == site) {
+              for(var j = 0; j < db_json[i].logins.length; j++) {
+                if(db_json[i].logins[j].title == title && db_json[i].logins[j].password == password && db_json[i].logins[j].username ==username) {
+                  console.log(j);
+                  db_json[i].logins.splice(j,1);
+                  loginPushed = true;
+
+                }
+              }
+            }
+          }
+
+          if(loginPushed && addToDatabase(JSON.stringify(db_json))) {
+            console.log("Login Deleted.");
+            $('#delete_confirm_dialog').remove();
+          }
+          else {
+            console.log("Login not deleted.");
+          }
+        }
+      }
+    }
+
+
+    var init_App = {
+      "load_db" : function() {
+        var db = getDatabase();
+        var db_json = JSON.parse(db);
+        return db_json;
+      },
+
+      "init_settings" : function() {
+        //initialize default username
+        if(window.localStorage.getItem("Smart_user")) {
+
+        }
+        else {
+          window.localStorage.setItem("Smart_user","default");
+        }
+
+        var db = this.load_db();
+        var html = "";
+
+        var home = "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" onclick=\"goHome()\"> Home </div>";
+        var edit = "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" onclick=\"editAccount();\"> Edit Account </div>";
+        var seperator = "<div style=\"border:0px solid white;border-top:1px solid white;width:280px;color:white;margin:0px auto;\"></div>";
+        var add_new = "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" onclick=\"addNewSite.init();\"> Add New </div>";
+
+        var new_site = [{"val" : "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" data-site=\""}, {"val" : "\" data-domain=\""}, {"val" : "\" onclick=\"loadCredentials(this)\"> "},{"val" : " </div>"}];
+        var quitApp = "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" onclick=\"navigator.app.exitApp();\"> Exit </div>";
+
+        var refresh = "<div style=\"height:50px;width:300px;line-height:50px;font-size:20px;\" onclick=\"init_App.init_settings();\"> Refresh </div>";
+
+        html += home + seperator + edit +seperator;
+        for(var i = 0; i < db.length; i++) {
+          var site = db[i].site;
+          var domain = db[i].domain;
+          html += new_site[0].val + site + new_site[1].val + domain + new_site[2].val + site + new_site[3].val + seperator;
+        }
+        html += add_new + seperator + refresh + seperator + quitApp;
+        document.getElementById("left_box_body").innerHTML = html;
+      }
+      
+    }
+
+
+    var editAccount = function(){
+      editAppMainPage.setTitle("Edit Account");
+      var Smart_user = window.localStorage.getItem("Smart_user");
+      
+
+      var content = "<form> <br> <br> <input type=\"text\" name=\"Smart_username\" class=\"topcoat-text-input\" onclick=\";\" onblur=\"\" value=\""+ Smart_user + "\"> <br> <br> <button class=\"topcoat-button\" id=\"add_new_login_button\" onclick=\"event.preventDefault();window.localStorage.setItem(\'Smart_user\', this.parentElement.Smart_username.value);alert(\'You changed your Smart Username\');\"> Done </button> </form>";
+
+      editAppMainPage.setBody(content);
+      $("#center_box").animate({
+        left : "0px"
+      },500);
+    }
+
+  var goHome = function() {
+    var content = "<div class=\"connection_display\" style=\"margin:5px auto;height:180px;width:340px;background:rgba(120,120,120,0.3);padding:0px 0px 0px 0px;border-radius:5px;\"><div style=\"height:30px;width:340px;background:rgba(80,80,80,0.9);color:white;text-align:center;line-height:30px;font-weight:bold;border-radius:5px 5px 0px 0px;\"> Connection </div> <div id=\"status_disp\" style=\"height:150px;width:300px;padding:0px 20px 0px 20px;background:rgba(120,120,120,0);color:black;text-align:left;line-height:30px;border-radius:0px 0px 5px 5px;\"> Connected </div> </div>";
+    editAppMainPage.setBody(content);
+    $("#center_box").animate({
+        left : "0px"
+      },500);
+  }
+    
+  </script>
+
+</head>
+
+
+<body style="width:360px;border:0px solid black;margin:auto auto;">
+
+  <!-- App Body -->
+  <div id="app_body" style="position:relative;top:0px;left:0px;">
+
+    <!-- Left Box -->
+    <div id="left_box" style="width:300px;height:616px;background:rgba(80,80,80,1);overflow:hidden;display:block;z-index:11;position:fixed;top:0px;left:0px;">
+
+      <div style="overflow:hidden;" class="" id="left_box_title">
+        <div class="topcoat-navigation-bar" id="" style="color:white;background:rgba(24,44,68,1);">
+          <div class="topcoat-navigation-bar__item center full">
+            <h1 class="topcoat-navigation-bar__title" style="color:white;"> Settings </h1>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(79,97,118,1);text-align:center;color:black;" id="left_box_body">
+      </div>
+
+    </div>
+    <!--***************** End of Left Box *******************************-->
+
+    <!--***** Center Box ******-->
+    <div id="center_box" onclick="" style="width:360px;height:800px;background:rgba(220,220,220,1);position:fixed;top:0px;left:0px;z-index:1000;box-shadow:0px 0px 5px black;">
+
+      <div style="overflow:hidden;position:relative;top:0px;left:0px;z-index:3399;" class="">
+        <div class="topcoat-navigation-bar" id="" style="color:white;background:rgba(70,70,70,1);">
+          <div class="topcoat-navigation-bar__item center full" style="color:white;">
+            <h1 class="topcoat-navigation-bar__title" style="color:white;" id="app_main_display_title"> Smart Login </h1>
+          </div>
+        </div>
+      </div>
+
+      <div id="app_main_display_body" style="padding:0px 4px 50px 4px;height:806px;overflow-y:scroll;position:relative;top:0px;left:0px;z-index:99;">
+
+        <div class="connection_display" style="margin:5px auto;height:180px;width:340px;background:rgba(120,120,120,0.3);padding:0px 0px 0px 0px;border-radius:5px;">
+          <!-- title -->
+          <div style="height:30px;width:340px;background:rgba(80,80,80,0.9);color:white;text-align:center;line-height:30px;font-weight:bold;border-radius:5px 5px 0px 0px;">
+            Connection
+          </div>
+
+          <div id="status_disp" style="height:150px;width:300px;padding:0px 20px 0px 20px;background:rgba(120,120,120,0);color:black;text-align:left;line-height:30px;border-radius:0px 0px 5px 5px;">
+            <img src="loading.gif" title="Loading" height="80px" width="80px" align="middle"> <span style="font-weight:bold;text-size:30px;line-height:30px;color:black; " > Connecting </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--***************** End of Center Box *******************************-->
+
+    <!-- Right Box -->
+    <div id="right_box" style="width:360px;height:616px;position:fixed;top:70px;left:360px;box-shadow:0px 0px 5px black;background:rgba(220,220,220,1);z-index:10000000000000004;">
+
+
+    </div>
+    <!--***************** End of Right Box *******************************-->
+
+    <!--***************** End of App Body *******************************-->
+  </div>
+</body>
+
+</html>

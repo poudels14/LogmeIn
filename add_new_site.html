@@ -1,0 +1,74 @@
+<html>
+<head>
+  <title>
+    Mobile Final
+  </title>
+
+  <link href="topcoat-mobile-light.css" rel="stylesheet">
+  <script src="jquery-2.1.0.min.js"></script>
+  
+  
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+
+      $("#add_new_login_title").click(function(){
+        $("#add_new_login_body").slideToggle();
+      });
+
+      $("#google_login_1_title").click(function(){
+        $("#google_login_1_body").slideToggle();
+      });
+    });
+
+
+    var placeHolder = function (ele, def){
+      if(ele.value == def) {
+        ele.value = "";
+      }
+
+      else if(ele.value == "") {
+        ele.value = def;
+      }
+    }
+
+  </script>
+</head>
+
+
+<body style="width:300px;border:6px solid black;margin:auto auto;">
+  <!--************************************************************************************************-->
+  <div style="overflow:hidden;" class="" id="">
+    <div style="background:white;overflow:hidden;" class="" id="">
+      <div class="topcoat-navigation-bar" id="" style="color:black;background:rgba(155,155,155,1);">
+        <div class="topcoat-navigation-bar__item center full">
+          <h1 class="topcoat-navigation-bar__title" style="color:white;">Add New</h1>
+        </div>
+      </div>
+    </div>
+
+    <div id="" style="width:232px;height:400px;margin:auto;">
+      <br>
+      <input type="text" class="topcoat-text-input" onfocus="placeHolder(this, 'Site Name');" onblur="placeHolder(this, 'Site Name');"value="Site Name"> 
+      <br>
+      <br>
+      <input type="text" class="topcoat-text-input" onclick="placeHolder(this, 'Address');" onblur="placeHolder(this, 'Address');" value="Address"> 
+      <br>
+      <br>
+      <input type="text" class="topcoat-text-input" onclick="placeHolder(this, 'Username/ Email');" onblur="placeHolder(this, 'Username/ Email');" value="Username/ Email"> 
+      <br>
+      <br>
+      <input type="password" class="topcoat-text-input" onclick="placeHolder(this, 'Password');" onblur="placeHolder(this, 'Password');" value="Password">
+      <br>
+      <br>
+      <button class="topcoat-button" id="add_new_login_button">Done</button>
+    </div>
+  </div>
+
+  <!--************************************************************************************************-->
+  <!--************************************************************************************************-->
+  <!--************************************************************************************************-->
+
+</body>
+</html>

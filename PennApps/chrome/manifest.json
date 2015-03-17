@@ -1,0 +1,26 @@
+{
+  "name" : "Login",
+  "version" : "1.1",
+  "description" : "",
+  "page_action" :
+  {
+    "default_icon" : "login.png",
+    "default_title" : "LogIn"
+  },
+  "content_scripts" : [
+    {
+      "matches" : [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js" : ["contentscript.js"],
+      "run_at" : "document_idle",
+      "all_frames" : false
+    }
+  ],
+  "icons" : {
+    "48" : "LogIn.png",
+    "128" : "LogIn.png"
+  },
+  "manifest_version": 2
+}
